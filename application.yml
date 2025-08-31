@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/fincoach?useSSL=false&serverTimezone=America/Sao_Paulo
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.format_sql: true
+      hibernate.jdbc.time_zone: America/Sao_Paulo
+  flyway:
+    locations: classpath:db/migration
