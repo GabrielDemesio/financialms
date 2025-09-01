@@ -1,14 +1,12 @@
-package financial.repository;
+package financial.repositories;
 
 import financial.entities.TransactionEntity;
-import org.springframework.cglib.core.Local;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public interface TransactionRepo {
+public interface TransactionRepository {
     @Query("""
      SELECT new com.app.api.dto.CategoryTotalDTO(t.category.id, t.category.name,
               SUM(CASE WHEN t.type = 'EXPENSE' THEN t.amount ELSE 0 END))
