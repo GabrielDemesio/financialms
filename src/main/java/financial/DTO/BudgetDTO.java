@@ -13,6 +13,3 @@ public record BudgetDTO(
 ) {}
 
 
-public record BudgetResponse(
-        Long id, Long categoryId, String categoryName, String month, BigDecimal amount
-) {}

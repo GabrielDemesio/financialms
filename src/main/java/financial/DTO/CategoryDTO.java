@@ -4,15 +4,16 @@ import financial.entities.enums.CategoryKind;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record CategoryDTO {
-    @NotBlank String name,
-    @NotNull CategoryKind kind,
-    String color
-} {}
+public record CategoryDTO (
+    @NotBlank
+    String name,
+    @NotNull
+    CategoryKind kind,
 
-public record CategoryResponse(
-        Long id, String name, CategoryKind kind, String color
-){}
+    String color
+) {}
+
+
 
 
 

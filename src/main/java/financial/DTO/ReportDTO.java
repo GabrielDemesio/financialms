@@ -11,4 +11,3 @@ public record ReportDTO(String month,
 ) {}
 
 
-public record CategoryTotal(Long categoryId, String name, BigDecimal total) {}

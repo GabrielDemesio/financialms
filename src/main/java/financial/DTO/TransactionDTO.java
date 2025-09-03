@@ -18,7 +18,3 @@ public record TransactionDTO(
 ) {}
 
 
-public record TransactionResponse(
-        Long id, Long categoryId, String categoryName, LocalDate occurredAt,
-        String description, BigDecimal amount, TransactionType type, boolean recurring, String merchant
-) {}
