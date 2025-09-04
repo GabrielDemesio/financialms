@@ -20,7 +20,7 @@ public class TransactionEntity {
     private Long id;
 
     @Column(name = "user_id", nullable = false)
-    private long userId;
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
