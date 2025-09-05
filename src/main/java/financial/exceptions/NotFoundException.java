@@ -1,4 +1,7 @@
 package financial.exceptions;
 
-public class Exceptions {
+public class NotFoundException extends RuntimeException {
+    public NotFoundException(String message) {
+        super(message);
+    }
 }

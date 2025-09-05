@@ -1,4 +1,8 @@
 package financial.entities.enums;
 
-public class CategoryKind {
+public enum CategoryKind {
+    FIXO,
+    VARIAVEL,
+    DIVIDA,
+    INVESTIMENTO
 }
