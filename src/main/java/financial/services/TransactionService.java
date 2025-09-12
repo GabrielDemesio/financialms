@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -23,7 +21,7 @@ public class TransactionService {
         var start = financial.utils.YearMonthUtils.startOf(month);
         var end = financial.utils.YearMonthUtils.startOfNext(month);
         return transactionRepository.findByUserIdAndOccurredAtBetween(userId, start, end).stream().map(t -> new TransactionResponse(
-                t.getId(), t.getCategoryEntity().getId(), t.getCategoryEntity().getName(), t.getOccuredAt(),
+                t.getId(), t.getCategoryEntity().getId(), t.getCategoryEntity().getName(), t.getOccurredAt(),
                 t.getDescription(), t.getAmount(), t.getTransactionType(), t.isRecurring(), t.getMerchant())).toList();
     }
     public TransactionResponse create(Long userId, TransactionDTO transactionDTO) {
@@ -31,7 +29,7 @@ public class TransactionService {
         TransactionEntity transactionEntity = new TransactionEntity();
         transactionEntity.setUserId(userId);
         transactionEntity.setCategoryEntity(categoryEntity);
-        transactionEntity.setOccuredAt(transactionDTO.occurredAt());
+        transactionEntity.setOccurredAt(transactionDTO.occurredAt());
         transactionEntity.setDescription(transactionDTO.description());
         transactionEntity.setAmount(transactionDTO.amount());
         transactionEntity.setTransactionType(transactionDTO.type());
@@ -41,7 +39,7 @@ public class TransactionService {
 
         transactionEntity = transactionRepository.save(transactionEntity);
         return new TransactionResponse(
-                transactionEntity.getId(), categoryEntity.getId(), categoryEntity.getName(), transactionEntity.getOccuredAt(),
+                transactionEntity.getId(), categoryEntity.getId(), categoryEntity.getName(), transactionEntity.getOccurredAt(),
                 transactionEntity.getDescription(), transactionEntity.getAmount(), transactionEntity.getTransactionType(), transactionEntity.isRecurring(), transactionEntity.getMerchant()
         );
     }

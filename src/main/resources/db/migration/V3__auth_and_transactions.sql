@@ -1,0 +1,25 @@
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  cpf VARCHAR(14) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_users_email (email),
+  UNIQUE KEY uk_users_cpf (cpf)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  type VARCHAR(20) NOT NULL,
+  amount DECIMAL(15,2) NOT NULL,
+  description VARCHAR(255) NULL,
+  product_name VARCHAR(255) NULL,
+  installments INT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_tx_user (user_id, created_at),
+  CONSTRAINT fk_tx_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

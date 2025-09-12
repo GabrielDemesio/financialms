@@ -1,0 +1,198 @@
+{
+  "info": {
+    "name": "financialms-auth",
+    "_postman_id": "a1b2c3d4-e5f6-4a4a-9a9a-000111222333",
+    "description": "Auth + CPF + Transações por usuário",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Gabriel\", \"email\": \"gabriel@example.com\", \"password\": \"12345678\", \"cpf\": \"12345678901\"}"
+        },
+        "description": "Cria usuário (CPF único) e retorna JWT."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let data = pm.response.json();",
+              "if (data && data.token) { pm.environment.set('token', data.token); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"gabriel@example.com\", \"password\": \"12345678\"}"
+        },
+        "description": "Autentica e retorna JWT."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let data = pm.response.json();",
+              "if (data && data.token) { pm.environment.set('token', data.token); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Me",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Transaction (Deposit)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/transactions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "transactions"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"type\": \"DEPOSIT\", \"amount\": 1000.0, \"description\": \"Depósito inicial\"}"
+        }
+      }
+    },
+    {
+      "name": "Create Transaction (Expense)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/transactions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "transactions"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"type\": \"EXPENSE\", \"amount\": 59.9, \"description\": \"Supermercado\", \"productName\": \"Café\", \"installments\": 1}"
+        }
+      }
+    },
+    {
+      "name": "List My Transactions",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/transactions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "transactions"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

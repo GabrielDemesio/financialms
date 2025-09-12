@@ -79,7 +79,7 @@ Controller → Service → Repository (JPA) → MySQL
 1. Crie o banco (ajuste collation se quiser):
 
 ```sql
-CREATE DATABASE fincoach CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE financial CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 ```
 
 2. Configure credenciais no `application.yml` (ou via variáveis de ambiente, ver abaixo).
