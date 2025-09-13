@@ -7,4 +7,4 @@ public record CategoryResponse(
         String name,
         CategoryKind kind,
         String color
-){}
+) {}

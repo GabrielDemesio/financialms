@@ -30,7 +30,7 @@ public class TransactionController {
     @ResponseStatus(HttpStatus.CREATED)
     public TransactionResponse create(@RequestHeader(value = "X-User-Id",
     required = false)Long userId,
-                                      @Valid @RequestParam TransactionDTO transactionDTO){
+                                      @Valid @RequestBody TransactionDTO transactionDTO){
         return transactionService.create(UserHeader.getOrDefault(userId), transactionDTO);
     }
 

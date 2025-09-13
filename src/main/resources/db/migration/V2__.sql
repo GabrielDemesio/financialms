@@ -1,4 +1,4 @@
-CREATE TABLE budgets
+CREATE TABLE if not exists budgets
 (
     id          BIGINT AUTO_INCREMENT NOT NULL,
     user_id     BIGINT                NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE budgets
     CONSTRAINT pk_budgets PRIMARY KEY (id)
 );
 
-CREATE TABLE categories
+CREATE TABLE if not exists  categories
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
     user_id       BIGINT                NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE categories
     CONSTRAINT pk_categories PRIMARY KEY (id)
 );
 
-CREATE TABLE transactions
+CREATE TABLE  if not exists  transactions
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
     user_id       BIGINT                NOT NULL,

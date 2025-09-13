@@ -1,13 +1,4 @@
 package financial.DTO;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-public record ReportDTO(String month,
-                        BigDecimal totalIncome,
-                        BigDecimal totalExpense,
-                        BigDecimal net,
-                        List<CategoryTotal> byCategory
-) {}
-
-
+// Mantido apenas para compatibilidade; se não for usado, pode remover este arquivo.
+public record ReportDTO() {}
