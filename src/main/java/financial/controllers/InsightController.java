@@ -1,10 +1,10 @@
 package financial.controllers;
 
-
 import financial.DTO.InsightDTO;
-import financial.DTO.TransactionResponse;
 import financial.services.InsightService;
+import financial.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
@@ -18,10 +18,10 @@ public class InsightController {
     private final InsightService insightService;
 
     @GetMapping
-    public List<InsightDTO> insightDTOS(@RequestHeader (value = "X-User-Id", required = false) Long userId,
+    public List<InsightDTO> insightDTOS(Authentication authentication,
                                         @RequestParam String month){
-
         var yearMonth = YearMonth.parse(month);
-        return insightService.generate(UserHeader.getOrDefault(userId), yearMonth);
+        Long userId = AuthUtils.getCurrentUserId(authentication);
+        return insightService.generate(userId, yearMonth);
     }
 }

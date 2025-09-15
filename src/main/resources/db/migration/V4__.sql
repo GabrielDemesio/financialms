@@ -1,58 +1,45 @@
-CREATE TABLE budgets
-(
-    id               BIGINT AUTO_INCREMENT NOT NULL,
-    user_id          BIGINT                NOT NULL,
-    month            date                  NOT NULL,
-    category_id      BIGINT                NOT NULL,
-    amount           DECIMAL(12, 2)        NOT NULL,
-    transaction_type VARCHAR(10)           NOT NULL,
-    is_recurring     BIT(1)                NOT NULL,
-    merchant         VARCHAR(120)          NULL,
-    CONSTRAINT pk_budgets PRIMARY KEY (id)
-);
+-- V4__constraints_and_budget_extras.sql (substitui o conteúdo da tua V4__.sql)
 
-CREATE TABLE categories
-(
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    user_id       BIGINT                NOT NULL,
-    name          VARCHAR(80)           NOT NULL,
-    category_kind VARCHAR(20)           NOT NULL,
-    color         VARCHAR(7)            NULL,
-    CONSTRAINT pk_categories PRIMARY KEY (id)
-);
+-- Acrescentar colunas novas em budgets (se ainda não existirem):
+ALTER TABLE budgets
+    ADD COLUMN IF NOT EXISTS transaction_type VARCHAR(10) NOT NULL DEFAULT 'EXPENSE',
+    ADD COLUMN IF NOT EXISTS is_recurring     BIT(1)      NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS merchant         VARCHAR(120) NULL;
 
-CREATE TABLE transactions
-(
-    id               BIGINT AUTO_INCREMENT NOT NULL,
-    user_id          BIGINT                NOT NULL,
-    category_id      BIGINT                NOT NULL,
-    ocurred_at       date                  NOT NULL,
-    `description`    VARCHAR(255)          NULL,
-    amount           DECIMAL(12, 2)        NOT NULL,
-    transaction_type VARCHAR(10)           NOT NULL,
-    is_recurring     BIT(1)                NOT NULL,
-    merchant         VARCHAR(120)          NULL,
-    CONSTRAINT pk_transactions PRIMARY KEY (id)
-);
-
-CREATE TABLE users
-(
-    id         BIGINT AUTO_INCREMENT NOT NULL,
-    name       VARCHAR(100)          NOT NULL,
-    email      VARCHAR(150)          NOT NULL,
-    password   VARCHAR(255)          NOT NULL,
-    phone      VARCHAR(15)           NULL,
-    created_at datetime              NOT NULL,
-    updated_at datetime              NULL,
-    is_active  BIT(1)                NOT NULL,
-    CONSTRAINT pk_users PRIMARY KEY (id)
-);
-
+-- Garantir UNIQUE em users.email:
 ALTER TABLE users
     ADD CONSTRAINT uc_users_email UNIQUE (email);
 
-ALTER TABLE budgets
-    ADD CONSTRAINT FK_BUDGETS_ON_CATEGORYID FOREIGN KEY (category_id) REFERENCES categories (id);
+-- Garantir FKs (só se não existirem ainda):
+-- MySQL não tem "ADD CONSTRAINT IF NOT EXISTS", então você pode checar antes ou nomear consistentemente e aceitar o erro benigno em dev.
+-- Uma forma defensiva é testar via information_schema e executar condicionalmente. Exemplo simples:
 
+-- FK budgets.category_id -> categories.id
+DO
+    BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_schema = DATABASE()
+          AND table_name = 'budgets'
+          AND constraint_name = 'FK_BUDGETS_ON_CATEGORYID'
+    ) THEN
+ALTER TABLE budgets
+    ADD CONSTRAINT FK_BUDGETS_ON_CATEGORYID
+        FOREIGN KEY (category_id) REFERENCES categories (id);
+END IF;
+END;
+
+-- FK transactions.category_id -> categories.id
+DO
+    BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_schema = DATABASE()
+          AND table_name = 'transactions'
+          AND constraint_name = 'FK_TRANSACTIONS_ON_CATEGORY'
+    ) THEN
 ALTER TABLE transactions
-    ADD CONSTRAINT FK_TRANSACTIONS_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES categories (id);
+    ADD CONSTRAINT FK_TRANSACTIONS_ON_CATEGORY
+        FOREIGN KEY (category_id) REFERENCES categories (id);
+END IF;
+END;
