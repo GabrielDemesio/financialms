@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
-    List<TransactionEntity> findByUserIdAndOccurredAtBetween(Long userId, LocalDate
+    List<TransactionEntity> findByUserIdAndOccuredAtBetween(Long userId, LocalDate
             start, LocalDate end);
     @Query("""
     SELECT t.categoryEntity.id, t.categoryEntity.name,
@@ -39,6 +39,6 @@ END),0)
     Object[] incomeExpenseTotals(@Param("userId") Long userId,
                                  @Param("start") LocalDate start,
                                  @Param("end") LocalDate end);
-    long countByUserIdAndOccurredAtBetweenAndRecurringTrue(Long userId,
+    long countByUserIdAndOccuredAtBetweenAndRecurringTrue(Long userId,
                                                            LocalDate start, LocalDate end);
 }

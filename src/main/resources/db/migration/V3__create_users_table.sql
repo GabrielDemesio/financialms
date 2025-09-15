@@ -1,19 +1,15 @@
-CREATE TABLE users
-(
-    id         BIGINT AUTO_INCREMENT NOT NULL,
-    name       VARCHAR(100)          NOT NULL,
-    email      VARCHAR(150)          NOT NULL,
-    password   VARCHAR(255)          NOT NULL,
-    phone      VARCHAR(15)           NULL,
-    created_at DATETIME              NOT NULL,
-    updated_at DATETIME              NULL,
-    is_active  BIT(1)                NOT NULL DEFAULT 1,
-    CONSTRAINT pk_users PRIMARY KEY (id),
-    CONSTRAINT uk_users_email UNIQUE (email)
-);
+-- Criação da tabela de usuários (MySQL 8+ / 9+)
+CREATE TABLE IF NOT EXISTS users (
+                                     id         BIGINT NOT NULL AUTO_INCREMENT,
+                                     name       VARCHAR(150) NOT NULL,
+                                     email      VARCHAR(255) NOT NULL,
+                                     cpf        CHAR(11) NULL,
+                                     password   VARCHAR(255) NOT NULL,
+                                     role       VARCHAR(30)  NOT NULL DEFAULT 'USER',
+                                     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                     updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
--- Criar índice para email para otimizar consultas de login
-CREATE INDEX idx_users_email ON users (email);
-
--- Criar índice para active para otimizar consultas de usuários ativos
-CREATE INDEX idx_users_active ON users (is_active);
+                                     PRIMARY KEY (id),
+                                     UNIQUE KEY uk_users_email (email),
+                                     UNIQUE KEY uk_users_cpf   (cpf)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

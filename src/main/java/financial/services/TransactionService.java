@@ -22,7 +22,7 @@ public class TransactionService {
     public List<TransactionResponse> listByMonth(Long userId, java.time.YearMonth month) {
         var start = financial.utils.YearMonthUtils.startOf(month);
         var end = financial.utils.YearMonthUtils.startOfNext(month);
-        return transactionRepository.findByUserIdAndOccurredAtBetween(userId, start, end).stream().map(t -> new TransactionResponse(
+        return transactionRepository.findByUserIdAndOccuredAtBetween(userId, start, end).stream().map(t -> new TransactionResponse(
                 t.getId(), t.getCategoryEntity().getId(), t.getCategoryEntity().getName(), t.getOccuredAt(),
                 t.getDescription(), t.getAmount(), t.getTransactionType(), t.isRecurring(), t.getMerchant())).toList();
     }

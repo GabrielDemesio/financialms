@@ -1,9 +1,10 @@
 package financial.controllers;
 
-
 import financial.DTO.MonthlySummary;
 import financial.services.ReportService;
+import financial.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
@@ -15,10 +16,10 @@ public class ReportController {
     private final ReportService reportService;
 
     @GetMapping("/monthly-summary")
-    public MonthlySummary summary(@RequestHeader(value = "X-User-Id",
-    required = false) Long userId,
+    public MonthlySummary summary(Authentication authentication,
                                   @RequestParam String month){
         var yearMonth = YearMonth.parse(month);
-        return reportService.monthlySummary(UserHeader.getOrDefault(userId), yearMonth);
+        Long userId = AuthUtils.getCurrentUserId(authentication);
+        return reportService.monthlySummary(userId, yearMonth);
     }
 }

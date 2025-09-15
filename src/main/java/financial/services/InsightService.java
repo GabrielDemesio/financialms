@@ -49,7 +49,7 @@ public class InsightService {
             }
         });
 
-        long recurringCount = transactionRepository.countByUserIdAndOccurredAtBetweenAndRecurringTrue(userId, start, end);
+        long recurringCount = transactionRepository.countByUserIdAndOccuredAtBetweenAndRecurringTrue(userId, start, end);
             if (recurringCount > 0) {
                 out.add(new InsightDTO(
                         "Assinaturas recorrentes",
