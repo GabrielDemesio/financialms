@@ -39,7 +39,7 @@ public class ExpenseCategoryService {
     }
     
     @Transactional
-    public ExpenseCategory updateCategory(Long categoryId, Long userId, String name, String color) {
+    public ExpenseCategory updateCategory(Long userId, Long categoryId, String name, String color) {
         ExpenseCategory category = getCategoryById(categoryId, userId)
             .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
         

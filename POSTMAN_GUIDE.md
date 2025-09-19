@@ -75,6 +75,8 @@ A collection possui scripts que automaticamente:
 }
 ```
 
+**⚠️ IMPORTANTE:** O sistema usa **CPF** para login, não email!
+
 ### **Depósito:**
 ```json
 {
