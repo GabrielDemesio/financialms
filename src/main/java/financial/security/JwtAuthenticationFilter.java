@@ -26,10 +26,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
     
     @Override
-    protected void doFilterInternal(HttpServletRequest request, 
-                                  HttpServletResponse response, 
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
                                   FilterChain filterChain) throws ServletException, IOException {
-        
+
+        // Pular filtro JWT para endpoints de autenticação
+        String path = request.getRequestURI();
+        log.info("JWT Filter - Path: {}, Method: {}", path, request.getMethod());
+        if (path.startsWith("/auth/")) {
+            log.info("JWT Filter - Pulando filtro para path: {}", path);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authorizationHeader = request.getHeader("Authorization");
         
         String username = null;

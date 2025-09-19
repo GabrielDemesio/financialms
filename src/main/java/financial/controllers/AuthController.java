@@ -22,6 +22,16 @@ public class AuthController {
     private final AuthService authService;
     private final UserService userService;
     
+    @GetMapping("/test")
+    public String test() {
+        return "API funcionando!";
+    }
+
+    @PostMapping("/test-post")
+    public String testPost(@RequestBody(required = false) String body) {
+        return "POST funcionando! Body: " + body;
+    }
+
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponseDTO register(@Valid @RequestBody RegisterDTO registerDTO) {

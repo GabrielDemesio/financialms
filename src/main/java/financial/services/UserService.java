@@ -20,9 +20,9 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmailAndActiveTrue(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
+    public UserDetails loadUserByUsername(String cpf) throws UsernameNotFoundException {
+        return userRepository.findByCpfAndActiveTrue(cpf)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + cpf));
     }
     
     public UserEntity register(RegisterDTO registerDTO) {
@@ -31,6 +31,7 @@ public class UserService implements UserDetailsService {
         }
         
         UserEntity user = new UserEntity();
+        user.setCpf(registerDTO.cpf());
         user.setName(registerDTO.name());
         user.setEmail(registerDTO.email());
         user.setPassword(passwordEncoder.encode(registerDTO.password()));

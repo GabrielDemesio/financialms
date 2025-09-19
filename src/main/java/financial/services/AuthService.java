@@ -35,14 +35,14 @@ public class AuthService {
     public AuthResponseDTO login(LoginDTO loginDTO) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginDTO.email(),
+                        loginDTO.cpf(),
                         loginDTO.password()
                 )
         );
-        
+
         UserEntity user = (UserEntity) authentication.getPrincipal();
         String token = jwtUtil.generateToken(user, user.getId());
-        
+
         return AuthResponseDTO.of(
                 token,
                 user.getId(),
