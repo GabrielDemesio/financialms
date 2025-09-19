@@ -1,46 +1,97 @@
 package financial.services;
 
-
-import financial.DTO.BudgetDTO;
-import financial.DTO.BudgetResponse;
 import financial.entities.Budget;
-import financial.entities.CategoryEntity;
 import financial.repositories.BudgetRepository;
-import financial.utils.YearMonthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.YearMonth;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class BudgetService {
+    
     private final BudgetRepository budgetRepository;
-    private final CategoryService categoryService;
-
-    public List<BudgetResponse> list(Long userId, YearMonth yearMonth) {
-        var list = budgetRepository.findByUserIdAndMonth(userId, YearMonthUtils.startOf(yearMonth));
-        return list.stream().map(b -> new BudgetResponse(
-                b.getId(), b.getCategory().getId(), b.getCategory().getName(), b.getMonth().toString(), b.getAmount())).toList();
+    private final ExpenseService expenseService;
+    
+    public List<Budget> getUserBudgets(Long userId) {
+        return budgetRepository.findByUserId(userId);
     }
-    public BudgetResponse upsert(Long userId, BudgetDTO budgetDTO) {
-        CategoryEntity categoryEntity = categoryService.getOwnedCategory(userId, budgetDTO.categoryId());
-        var monthDate = YearMonthUtils.startOf(budgetDTO.month());
-
-        var existing = budgetRepository.findByUserIdAndMonth(userId, monthDate).stream()
-                .filter(b -> b.getCategory().getId().equals(budgetDTO.categoryId()))
-                .findFirst()
-                .orElse(null);
-
-        Budget budget = (existing != null) ? existing : new Budget();
-        budget.setUserId(userId);
-        budget.setCategory(categoryEntity);
-        budget.setMonth(monthDate);
-        budget.setAmount(budgetDTO.amount());
-
-        budget =  budgetRepository.save(budget);
-
-        return new BudgetResponse(budget.getId(), categoryEntity.getId(), categoryEntity.getName(), budget.getMonth().toString(), budget.getAmount());
+    
+    public List<Budget> getUserBudgetsByMonth(Long userId, LocalDate yearMonth) {
+        // Normaliza para o primeiro dia do mês
+        LocalDate firstDayOfMonth = yearMonth.withDayOfMonth(1);
+        return budgetRepository.findByUserIdAndYearMonth(userId, firstDayOfMonth);
+    }
+    
+    public Optional<Budget> getBudgetByCategoryAndMonth(Long userId, Long categoryId, LocalDate yearMonth) {
+        LocalDate firstDayOfMonth = yearMonth.withDayOfMonth(1);
+        return budgetRepository.findByUserIdAndCategoryIdAndYearMonth(userId, categoryId, firstDayOfMonth);
+    }
+    
+    @Transactional
+    public Budget createOrUpdateBudget(Long userId, Long categoryId, LocalDate yearMonth, BigDecimal limitAmount) {
+        LocalDate firstDayOfMonth = yearMonth.withDayOfMonth(1);
+        
+        Optional<Budget> existingBudget = budgetRepository.findByUserIdAndCategoryIdAndYearMonth(userId, categoryId, firstDayOfMonth);
+        
+        Budget budget;
+        if (existingBudget.isPresent()) {
+            budget = existingBudget.get();
+            budget.setLimitAmount(limitAmount);
+        } else {
+            budget = new Budget();
+            budget.setUserId(userId);
+            budget.setCategoryId(categoryId);
+            budget.setYearMonth(firstDayOfMonth);
+            budget.setLimitAmount(limitAmount);
+        }
+        
+        return budgetRepository.save(budget);
+    }
+    
+    @Transactional
+    public void deleteBudget(Long budgetId, Long userId) {
+        Budget budget = budgetRepository.findById(budgetId)
+            .orElseThrow(() -> new RuntimeException("Orçamento não encontrado"));
+        
+        if (!budget.getUserId().equals(userId)) {
+            throw new RuntimeException("Acesso negado");
+        }
+        
+        budgetRepository.delete(budget);
+    }
+    
+    public BigDecimal getBudgetUsage(Long userId, Long categoryId, LocalDate yearMonth) {
+        LocalDate startOfMonth = yearMonth.withDayOfMonth(1);
+        LocalDate endOfMonth = yearMonth.withDayOfMonth(yearMonth.lengthOfMonth());
+        
+        return expenseService.getCategoryExpensesTotalByPeriod(userId, categoryId, startOfMonth, endOfMonth);
+    }
+    
+    public BigDecimal getBudgetRemaining(Long userId, Long categoryId, LocalDate yearMonth) {
+        Optional<Budget> budget = getBudgetByCategoryAndMonth(userId, categoryId, yearMonth);
+        if (budget.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        
+        BigDecimal used = getBudgetUsage(userId, categoryId, yearMonth);
+        BigDecimal remaining = budget.get().getLimitAmount().subtract(used);
+        
+        return remaining.max(BigDecimal.ZERO);
+    }
+    
+    public boolean isBudgetExceeded(Long userId, Long categoryId, LocalDate yearMonth) {
+        Optional<Budget> budget = getBudgetByCategoryAndMonth(userId, categoryId, yearMonth);
+        if (budget.isEmpty()) {
+            return false;
+        }
+        
+        BigDecimal used = getBudgetUsage(userId, categoryId, yearMonth);
+        return used.compareTo(budget.get().getLimitAmount()) > 0;
     }
 }

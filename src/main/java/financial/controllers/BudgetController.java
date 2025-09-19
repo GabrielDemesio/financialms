@@ -1,7 +1,7 @@
 package financial.controllers;
 
 import financial.DTO.BudgetDTO;
-import financial.DTO.BudgetResponse;
+import financial.entities.Budget;
 import financial.services.BudgetService;
 import financial.utils.AuthUtils;
 import jakarta.validation.Valid;
@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -19,17 +20,19 @@ public class BudgetController {
     private final BudgetService budgetService;
 
     @GetMapping
-    public List<BudgetResponse> list(Authentication authentication,
+    public List<Budget> list(Authentication authentication,
                                      @RequestParam String month){
         var yearMonth = YearMonth.parse(month);
+        LocalDate firstDayOfMonth = yearMonth.atDay(1);
         Long userId = AuthUtils.getCurrentUserId(authentication);
-        return budgetService.list(userId, yearMonth);
+        return budgetService.getUserBudgetsByMonth(userId, firstDayOfMonth);
     }
 
     @PostMapping
-    public BudgetResponse upsert(Authentication authentication,
+    public Budget createOrUpdate(Authentication authentication,
                                  @Valid @RequestBody BudgetDTO budgetDTO){
         Long userId = AuthUtils.getCurrentUserId(authentication);
-        return budgetService.upsert(userId, budgetDTO);
+        LocalDate yearMonth = budgetDTO.month().atDay(1);
+        return budgetService.createOrUpdateBudget(userId, budgetDTO.categoryId(), yearMonth, budgetDTO.amount());
     }
 }
