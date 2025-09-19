@@ -35,7 +35,7 @@ public class AuthService {
     public AuthResponseDTO login(LoginDTO loginDTO) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginDTO.email(),
+                        loginDTO.cpf(),
                         loginDTO.password()
                 )
         );

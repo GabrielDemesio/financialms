@@ -50,9 +50,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.disable()) // Desabilitar CORS temporariamente para teste
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll() // Para desenvolvimento
+                .requestMatchers("/actuator/**").permitAll() // Para health check
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

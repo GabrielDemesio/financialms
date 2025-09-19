@@ -26,10 +26,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
     
     @Override
-    protected void doFilterInternal(HttpServletRequest request, 
-                                  HttpServletResponse response, 
+    protected void doFilterInternal(HttpServletRequest request,
+                                  HttpServletResponse response,
                                   FilterChain filterChain) throws ServletException, IOException {
-        
+
+        // Pular autenticação para endpoints públicos
+        String path = request.getRequestURI();
+        if (path.startsWith("/auth/") || path.startsWith("/h2-console/") || path.startsWith("/actuator/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authorizationHeader = request.getHeader("Authorization");
         
         String username = null;
@@ -47,12 +54,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 UserDetails userDetails = userService.loadUserByUsername(username);
-                
+
                 if (jwtUtil.validateToken(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = 
+                    UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails, 
-                                    null, 
+                                    userDetails,
+                                    null,
                                     userDetails.getAuthorities()
                             );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
