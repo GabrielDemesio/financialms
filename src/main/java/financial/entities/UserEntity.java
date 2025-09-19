@@ -1,8 +1,9 @@
 package financial.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,17 +13,21 @@ import java.util.Collections;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity implements UserDetails {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false, unique = true, length = 11)
+    private String cpf;
+
     @Column(nullable = false, length = 100)
     private String name;
-    
+
     @Column(nullable = false, unique = true, length = 150)
     private String email;
     
@@ -63,6 +68,11 @@ public class UserEntity implements UserDetails {
         return email;
     }
     
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
